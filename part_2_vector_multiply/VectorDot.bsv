@@ -42,7 +42,12 @@ module mkVectorDot (VD);
                             address: zeroExtend(pos_a),
                             datain: ?});
 
-        if (pos_a < dim*zeroExtend(i))
+        // the start function (correctly) places pos_a at dim * i, so this
+        // should be dim * (i + 1), otherwise the condition always fails
+        //
+        // the -1 was added later as without it, it leaves a request in the
+        // queue, causing the calculation to have a duplicate pair!
+        if (pos_a < dim*zeroExtend(i + 1) - 1)
             pos_a <= pos_a + 1;
         else done_a <= True;
 
@@ -56,7 +61,12 @@ module mkVectorDot (VD);
                 address: zeroExtend(pos_b),
                 datain: ?});
 
-        if (pos_b < dim*zeroExtend(i))
+        // the start function (correctly) places pos_b at dim * i, so this
+        // should be dim * (i + 1), otherwise the condition always fails
+        //
+        // the -1 was added later as without it, it leaves a request in the
+        // queue, causing the calculation to have a duplicate pair!
+        if (pos_b < dim*zeroExtend(i + 1) - 1)
             pos_b <= pos_b + 1;
         else done_b <= True;
     
@@ -67,7 +77,8 @@ module mkVectorDot (VD);
         let out_a <- a.portA.response.get();
         let out_b <- b.portA.response.get();
 
-        output_res <=  out_a*out_b;     
+        // we cannot overwrite the output_res register every cycle
+        output_res <= output_res + out_a * out_b;     
         pos_out <= pos_out + 1;
         
         if (pos_out == dim-1) begin
@@ -85,15 +96,21 @@ module mkVectorDot (VD);
         ready_start <= True;
         dim <= dim_in;
         done_all <= False;
-        pos_a <= dim_in*zeroExtend(i);
-        pos_b <= dim_in*zeroExtend(i);
+        // this was using the OLD value i, instead of the new i_in, causing
+        // every test after the first one to be computed off by one set of
+        // indices
+        pos_a <= dim_in*zeroExtend(i_in);
+        pos_b <= dim_in*zeroExtend(i_in);
         done_a <= False;
         done_b <= False;
         pos_out <= 0;
+        // additionally, the result register must be reset
+        output_res <= 0;
         i <= i_in;
     endmethod
 
     method ActionValue#(Bit#(32)) response() if (done_all);
+        ready_start <= False;
         return output_res;
     endmethod
 

@@ -13,6 +13,20 @@ endfunction
 
 
 function Vector#(16, Word) barrelLeft(Vector#(16, Word) in, Bit#(4) shftAmnt);
-    return unpack(0);
-    // Implementation of a left barrel shifter
+    Vector#(16, Word) res = in;
+
+    if (shftAmnt[3] == 1) begin
+        res = naiveShfl(res, 8);
+    end
+    if (shftAmnt[2] == 1) begin
+        res = naiveShfl(res, 4);
+    end
+    if (shftAmnt[1] == 1) begin
+        res = naiveShfl(res, 2);
+    end
+    if (shftAmnt[0] == 1) begin
+        res = naiveShfl(res, 1);
+    end
+
+    return res;
 endfunction

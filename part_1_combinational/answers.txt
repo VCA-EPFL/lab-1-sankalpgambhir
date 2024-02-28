@@ -2,12 +2,35 @@
 
 3.  Shifters
 
->>
+>> 256 x 9 bit | 16 x 5 bit depending on Vector representation
+    Reasoning ::
+    Initially: 1 assignment
+    After unfolding for: 16 
+    After unpacking the vector: 16 x 16 = 256
+    Size: (idx.size + 1) + Word.size = 9 bits
+    +1 so that we can assign 0 or most significant for out of bounds accesses
 
->>
+    Alternatively, if we can access the sections of Vectors as words,
+    we can separate the Vector and word selections:
+    16 x 5 bit and then wire the Word directly
 
->>
+    I could not find concrete info about this representation, 
+    but I lean towards 256 as my answer.
+
+
+>> 0 selectors
+
+   We can unfold the loop and wire everything statically.
+
+>> 256 x 4 x 1 bit selectors
+
+   Shifting first (optionally) by 8 then by 4, 2, and 1. At each step, you want
+   to choose either the original or the shifted signal based on the control
+   signal given by `shiftAmnt[i]` at each step i.
 
 ---
 
-Time spent on Part 1: _____
+Time spent on Part 1: 1.5 hours
+                      Getting used to the syntax and mostly because my 
+                      compiler was broken and I had to get the github 
+                      release. Still debugging the OS package.

@@ -4,14 +4,15 @@ BINARY_NAME=AluTest ArbiterTest ShifterTest
 BSC_FLAGS=--aggressive-conditions -vdir $(BUILD_DIR) -bdir $(BUILD_DIR) -simdir $(BUILD_DIR) -o 
 TOP_MODULE=mkTest
 BSV_FILES_TRACKED=AluTest.bsv ArbiterTest.bsv ShifterTest.bsv
+BSC=/home/sankalp/courses/cca/lab1/part_1_combinational/bsc-2023.07-ubuntu-22.04/bin/bsc
 
 
 .PHONY: clean all $(BINARY_NAME)
 
 $(BINARY_NAME):
 	mkdir -p $(BUILD_DIR)
-	bsc $(BSC_FLAGS) $@ -sim -g $(TOP_MODULE) -u $@.bsv
-	bsc $(BSC_FLAGS) $@ -sim -e $(TOP_MODULE)
+	$(BSC) $(BSC_FLAGS) $@ -sim -g $(TOP_MODULE) -u $@.bsv
+	$(BSC) $(BSC_FLAGS) $@ -sim -e $(TOP_MODULE)
 
 clean:
 	rm -rf $(BUILD_DIR)
